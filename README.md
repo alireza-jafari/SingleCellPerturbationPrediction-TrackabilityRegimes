@@ -220,52 +220,14 @@ pip install wot
 
 ## Data setup
 
-The biological datasets have their own distribution channels and preprocessing conventions. A convenient local layout is:
+This repository does **not** redistribute the biological datasets. Please download each dataset from the original study or benchmark website, follow the corresponding license/terms of use, and cite the original data source in any derivative work. The synthetic experiments are generated directly by the notebooks and do not require an external dataset.
 
-```text
-data/
-├── ap1/
-├── 4i/
-├── sciplex3/
-└── reprogramming_2i/
-```
-
-Before running a notebook, update the dataset path variables in the first configuration cells. The notebooks were written to reproduce the paper experiments, so they may contain local paths that should be changed to match your machine.
-
----
-
-## Quick start
-
-### 1. Reproduce the synthetic phase-transition experiment
-
-```bash
-jupyter nbconvert \
-  --to notebook \
-  --execute LAOT_Synthetic_data.ipynb \
-  --output executed_LAOT_Synthetic_data.ipynb
-```
-
-### 2. Reproduce nonlinear-baseline degradation in the untrackable regime
-
-```bash
-jupyter nbconvert --to notebook --execute Cellot_Synthetic_data.ipynb --output executed_Cellot_Synthetic_data.ipynb
-jupyter nbconvert --to notebook --execute scGen_Synthetic_data.ipynb  --output executed_scGen_Synthetic_data.ipynb
-```
-
-### 3. Reproduce AP-1 within-context experiments
-
-```bash
-jupyter nbconvert --to notebook --execute AOT_AP-1_in_a_drug.ipynb     --output executed_AOT_AP1.ipynb
-jupyter nbconvert --to notebook --execute CellOT_AP-1_in_a_drug.ipynb  --output executed_CellOT_AP1.ipynb
-```
-
-### 4. Reproduce SciPlex3 scRNA-seq experiments
-
-```bash
-jupyter nbconvert --to notebook --execute AOT_single_cell_in_a_drug.ipynb              --output executed_AOT_scRNA.ipynb
-jupyter nbconvert --to notebook --execute CellOT_scGen_single_cell_in_a_drug.ipynb     --output executed_CellOT_scGen_scRNA.ipynb
-jupyter nbconvert --to notebook --execute Small_CellOT_scGen_single_cell_in_a_drug.ipynb --output executed_small_CellOT_scGen_scRNA.ipynb
-```
+| Dataset used in the paper | Original source to use | Notes for this repository |
+|---|---|---|
+| **AP-1 protein perturbations** | Comandante-Lou, Baumann, and Fallahi-Sichani, *Cell Reports* 2022: [study page / DOI](https://doi.org/10.1016/j.celrep.2022.111147), [PMC version](https://pmc.ncbi.nlm.nih.gov/articles/PMC9395172/), and the authors' [AP1-networkPlasticityMelanoma](https://github.com/fallahi-sichani-lab/AP1-networkPlasticityMelanoma) repository. In the paper, this is the AP-1 benchmark obtained from the original study page and **Supplementary Data S4**. | Used for DMSO $\rightarrow$ VEM protein perturbation prediction across melanoma cell lines. Place locally under `data/ap1/` after downloading. |
+| **4i multiplexed protein-imaging perturbations** | Gut et al., *Science* 2018: [paper / DOI](https://doi.org/10.1126/science.aar7042). For the benchmark format used by CellOT, use Bunne et al., *Nature Methods* 2023: [CellOT repository](https://github.com/bunnech/cellot) and [ETH Research Collection processed datasets](https://doi.org/10.3929/ethz-b-000609681). | Used for drug-response prediction after 8h exposure. Place locally under `data/4i/`. |
+| **SciPlex3 scRNA-seq perturbations** | Srivatsan et al., *Science* 2020: [paper / DOI](https://doi.org/10.1126/science.aax6234), [NCBI GEO GSE139944](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE139944), and the authors' [sci-plex code repository](https://github.com/cole-trapnell-lab/sci-plex). The CellOT-preprocessed version can also be obtained from the CellOT processed datasets above. | Used for 24h transcriptomic drug-response prediction. Place locally under `data/sciplex3/`. |
+| **2i reprogramming time-course** | Schiebinger et al., *Cell* 2019: [paper / DOI](https://doi.org/10.1016/j.cell.2019.01.006) and the [Waddington-OT tutorial/data page](https://broadinstitute.github.io/wot/tutorial/), which links the tutorial input data and transport maps. | Used for the 12h--168h time-gap sweep. Place locally under `data/reprogramming_2i/`. |
 
 ---
 
@@ -291,7 +253,7 @@ The paper reports MMD$^2$ under median-heuristic bandwidths and fixed-bandwidth 
 
 ---
 
-## Suggested repository topics
+## Repository topics
 
 `single-cell` · `perturbation-prediction` · `optimal-transport` · `linear-assignment` · `cellot` · `scgen` · `mmd` · `icml-2026` · `trackability` · `computational-complexity`
 
