@@ -94,7 +94,7 @@ The method is not introduced as a high-capacity model. Its purpose is to isolate
 ### Synthetic phase transition
 
 <p align="center">
-  <img src="assets/synthetic_phase_transition.png" width="850" alt="Synthetic phase transition in permutation recovery">
+  <img src="assets/synthetic_phase_transition.png" width="550" alt="Synthetic phase transition in permutation recovery">
 </p>
 
 In the controlled synthetic setup, the ground-truth map follows a near-identity linear path $W_\star(t)=I+tE$. LAOT recovers the latent permutation with near-perfect accuracy for small $t$, but recovery rapidly collapses after the transition into the NP-hard regime. Larger dimensions expand the trackable window.
