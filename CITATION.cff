@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the associated ICML 2026 paper."
+title: "Single-Cell Perturbation Prediction and Trackability Regimes"
+type: software
+authors:
+  - family-names: Jafari
+    given-names: Alireza
+  - family-names: Shakeri
+    given-names: Heman
+  - family-names: Daneshmand
+    given-names: Hadi
+repository-code: "https://github.com/alireza-jafari/SingleCellPerturbationPrediction-TrackabilityRegimes"
+url: "https://openreview.net/forum?id=lECKpTE1lW"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "Position: Temporal Measurement Interval Determines Computational and Model Complexity in Single-Cell Perturbation Analysis"
+  authors:
+    - family-names: Jafari
+      given-names: Alireza
+    - family-names: Shakeri
+      given-names: Heman
+    - family-names: Daneshmand
+      given-names: Hadi
+  conference:
+    name: "International Conference on Machine Learning"
+  year: 2026
+  url: "https://openreview.net/forum?id=lECKpTE1lW"
