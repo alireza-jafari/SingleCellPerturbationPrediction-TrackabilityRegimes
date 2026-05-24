@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environments
+.env
+.venv/
+venv/
+env/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data files
+data/
+*.h5ad
+*.h5
+*.csv
+*.tsv
+*.xlsx
+*.pkl
+*.npz
+*.npy
+
+# Outputs
+outputs/
+results/
+checkpoints/
+logs/
+
+# Large model/checkpoint files
+*.pt
+*.pth
+*.ckpt
