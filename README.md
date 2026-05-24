@@ -27,11 +27,11 @@
 
 ## Core message
 
-Single-cell perturbation prediction is usually treated as a modeling problem: collect unpaired control and treated cell populations, then use a sufficiently expressive model to map one distribution to the other. This repository supports a different conclusion:
+Single-cell perturbation prediction is often treated as a purely modeling problem: collect unpaired control and treated cell populations, then fit a sufficiently expressive model to map one distribution to the other. This repository supports a different conclusion:
 
 > **The measurement time gap is an experimental knob that controls both computational tractability and model complexity.**
 
-When the post-perturbation measurement is collected before a critical time gap $\Delta$, the latent correspondence between control and treated populations can be recovered efficiently under the paper's assumptions. After this correspondence is recovered, learning the transition map reduces to supervised estimation, and a simple linear model can be sufficient. When the measurement gap exceeds $\Delta$, correspondence recovery becomes NP-hard in the worst case, even when the underlying transition is linear.
+When the post-perturbation measurement is collected before a critical time gap $\Delta$, the latent correspondence between control and treated populations can be recovered efficiently under the paper's assumptions. After this correspondence is recovered, learning the perturbation map reduces to supervised estimation, and a simple linear model can be sufficient. When the measurement gap exceeds $\Delta$, correspondence recovery becomes NP-hard in the worst case, even when the underlying transition is linear.
 
 ---
 
@@ -85,19 +85,19 @@ for k = 1, ..., K:
 Output: W and predictor x_new^(t) = W x_new^(0)
 ```
 
-The method is not introduced as a high-capacity model. Its purpose is to isolate the role of measurement timing: when the experimental design places the task in the trackable regime, a simple linear transition can match or outperform larger nonlinear baselines.
+The method is not introduced as a high-capacity architecture. Its purpose is to isolate the role of measurement timing: when the experimental design places the task in the trackable regime, a simple linear transition can match or outperform larger nonlinear baselines.
 
 ---
 
-## Visual summary of the main empirical result
+## Visual summary
 
 ### Synthetic phase transition
 
 <p align="center">
-  <img src="assets/synthetic_phase_transition.png" width="550" alt="Synthetic phase transition in permutation recovery">
+  <img src="assets/synthetic_phase_transition.png" width="560" alt="Synthetic phase transition in permutation recovery">
 </p>
 
-In the controlled synthetic setup, the ground-truth map follows a near-identity linear path $W_\star(t)=I+tE$. LAOT recovers the latent permutation with near-perfect accuracy for small $t$, but recovery rapidly collapses after the transition into the NP-hard regime. Larger dimensions expand the trackable window.
+In the controlled synthetic setup, the ground-truth map follows a near-identity linear path $W_\star(t)=I+tE$. LAOT recovers the latent permutation with near-perfect accuracy for small $t$, but recovery rapidly collapses after the transition into the NP-hard regime. Larger feature dimensions expand the trackable window.
 
 ### Nonlinear baselines also degrade beyond trackability
 
@@ -113,47 +113,29 @@ The collapse is not specific to LAOT. Compact CellOT, scGen, and LAOT all show i
   <img src="assets/optimization_stability.png" width="950" alt="Optimization stability comparison on AP-1 COLO858 DMSO to VEM">
 </p>
 
-On the within-context AP-1 task, high-capacity CellOT can show non-monotone training dynamics, Compact CellOT stabilizes part of the trajectory, and LAOT converges rapidly with nearly coincident train/test curves.
+On the within-context AP-1 task, high-capacity CellOT can show non-monotone training dynamics. Compact CellOT stabilizes part of the trajectory, while LAOT converges rapidly with nearly coincident train/test curves.
 
 ---
 
-## Benchmarks reproduced in this repository
+## What is in this repository?
 
-This code release supports the experiments in the paper across synthetic and biological perturbation settings.
+The repository is organized around the main experimental blocks of the paper. Each folder contains notebooks for one benchmark or one analysis regime.
 
-| Benchmark | Modality | Setting | Main purpose |
-|---|---|---|---|
-| Synthetic near-identity data | simulated vectors | varying $t$ and $d$ | phase transition in latent permutation recovery |
-| AP-1 | targeted protein panel | DMSO $\rightarrow$ VEM, 48h | within-cell-line and replicate perturbation prediction |
-| 4i | multiplexed protein imaging | drug exposure, 8h | within-context drug perturbation prediction |
-| SciPlex3 | scRNA-seq | 24h drug response | transcriptome-scale perturbation prediction |
-| 2i time course | scRNA-seq trajectory | 12h to 168h horizons | biological time-gap sweep |
-| Cross-cell-line AP-1 | targeted protein panel | held-out cell line | out-of-context generalization stress test |
-
-### Representative paper results
-
-Lower MMD$^2$ is better.
-
-| Dataset | Condition | CellOT | scGen | Compact CellOT | LAOT |
-|---|---:|---:|---:|---:|---:|
-| AP-1 | COLO858 | 0.0995 | 0.0172 | 0.0019 | **0.0006** |
-| AP-1 | WM902B | 0.0443 | 0.1423 | 0.0015 | **0.0007** |
-| AP-1 | SKMEL19 | 0.1122 | 0.0323 | 0.0016 | **0.0011** |
-| 4i | Imatinib | 0.0700 | 0.0330 | 0.0079 | **0.0063** |
-| 4i | Trametinib | 0.0463 | 0.0098 | **0.0076** | 0.0080 |
-| 4i | Dexamethasone | 0.0685 | 0.0160 | 0.0075 | **0.0071** |
-
-| SciPlex3 drug | CellOT | scGen | Compact CellOT | LAOT |
-|---|---:|---:|---:|---:|
-| Trametinib | 0.0078 | 0.0059 | 0.0048 | **0.0040** |
-| Givinostat | 0.0117 | 0.0083 | 0.0079 | **0.0033** |
-| Abexinostat | 0.0129 | 0.0091 | 0.0074 | **0.0038** |
+| Paper component | Repository folder | Notebooks / role |
+|---|---|---|
+| Synthetic phase transition and untrackable-regime tests | [`Synthetic_data_experiments/`](Synthetic_data_experiments/) | `Synthetic_data_permutation.ipynb`, `LAOT_Synthetic_data.ipynb`, `Compact_CellOT_Synthetic_data.ipynb`, `scGen_Synthetic_data.ipynb` |
+| AP-1 within-context protein perturbation | [`AP-1_within_context_protein_perturbation/`](AP-1_within_context_protein_perturbation/) | LAOT, CellOT, Compact CellOT, and scGen notebooks for within-cell-line DMSO $\rightarrow$ VEM prediction |
+| AP-1 replicate generalization | [`AP-1_within_context_protein_perturbation_replicate/`](AP-1_within_context_protein_perturbation_replicate/) | LAOT, CellOT, Compact CellOT, and scGen notebooks for cross-replicate robustness |
+| AP-1 cross-context / OOD generalization | [`AP-1_cross_context_protein_perturbation_OOD/`](AP-1_cross_context_protein_perturbation_OOD/) | LAOT, CellOT, Compact CellOT, and scGen notebooks for held-out-cell-line transfer |
+| 4i within-context protein-imaging perturbation | [`4i_within_context_protein_perturbation/`](4i_within_context_protein_perturbation/) | LAOT, CellOT, Compact CellOT, and scGen notebooks for 8h drug-response prediction |
+| SciPlex3 within-context scRNA-seq perturbation | [`SciPlex3_within_context_scRNA-seq_perturbation/`](SciPlex3_within_context_scRNA-seq_perturbation/) | LAOT, CellOT, Compact CellOT, and scGen notebooks for 24h transcriptomic drug-response prediction |
+| 2i biological time-course sweep | [`2i_time_course/`](2i_time_course/) | `LAOT_2i_time_course.ipynb` for 12h--168h horizon analysis |
+| Paper plots | [`Plots/`](Plots/) | PDF plots used for training dynamics, 2i horizon sweep, and permutation recovery |
+| README figures | [`assets/`](assets/) | PNG assets used in this README |
 
 ---
 
 ## Repository structure
-
-The current release is notebook-centered so that each major paper result can be inspected and rerun directly.
 
 ```text
 .
@@ -163,31 +145,55 @@ The current release is notebook-centered so that each major paper result can be 
 │   ├── overview_trackability.png
 │   ├── synthetic_phase_transition.png
 │   ├── untrackable_model_degradation.png
-│   └── optimization_stability.png
+│   ├── optimization_stability.png
+│   └── file.png
 │
-├── LAOT_Synthetic_data.ipynb
-├── Cellot_Synthetic_data.ipynb
-├── scGen_Synthetic_data.ipynb
+├── Plots/
+│   ├── cellot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
+│   ├── compact_cellot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
+│   ├── laot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
+│   ├── mmd2_gamma_0.100_2i.pdf
+│   └── permutation_recovery.pdf
 │
-├── AOT_AP-1_in_a_drug.ipynb
-├── AOT_AP-1_in_a_drug_replicate.ipynb
-├── CellOT_AP-1_in_a_drug.ipynb
-├── identity_Heman_in_a_drug.ipynb
+├── Synthetic_data_experiments/
+│   ├── Synthetic_data_permutation.ipynb
+│   ├── LAOT_Synthetic_data.ipynb
+│   ├── Compact_CellOT_Synthetic_data.ipynb
+│   └── scGen_Synthetic_data.ipynb
 │
-├── AOT_4I_in_a_drug.ipynb
-├── CellOT_4I_in_a_drug.ipynb
-├── identity_4I_in_a_drug.ipynb
+├── AP-1_within_context_protein_perturbation/
+│   ├── LAOT_AP-1_within_context.ipynb
+│   ├── CellOT_AP-1_within_context.ipynb
+│   ├── Compact_CellOT_AP-1_within_context.ipynb
+│   └── scGen_AP-1_within_context.ipynb
 │
-├── AOT_2I_in_a_drug.ipynb
+├── AP-1_within_context_protein_perturbation_replicate/
+│   ├── LAOT_AP-1_within_context_replicate.ipynb
+│   ├── CellOT_AP-1_within_context_replicate.ipynb
+│   ├── Compact_CellOT_AP-1_within_context_replicate.ipynb
+│   └── scGen_AP-1_within_context_replicate.ipynb
 │
-├── AOT_single_cell_in_a_drug.ipynb
-├── csGen_single_cell_in_a_drug.ipynb
-├── CellOT_scGen_single_cell_in_a_drug.ipynb
-├── Small_CellOT_scGen_single_cell_in_a_drug.ipynb
-└── identity_single_cell_in_a_drug.ipynb
+├── AP-1_cross_context_protein_perturbation_OOD/
+│   ├── LAOT_AP-1_cross_context.ipynb
+│   ├── CellOT_AP-1_cross_context.ipynb
+│   ├── Compact_CellOT_AP-1_cross_context.ipynb
+│   └── scGen_AP-1_cross_context.ipynb
+│
+├── 4i_within_context_protein_perturbation/
+│   ├── LAOT_4i_within_context.ipynb
+│   ├── CellOT_4i_within_context.ipynb
+│   ├── Compact_CellOT_4i_within_context.ipynb
+│   └── scGen_4i_within_context.ipynb
+│
+├── SciPlex3_within_context_scRNA-seq_perturbation/
+│   ├── LAOT_SciPlex3_within_context.ipynb
+│   ├── CellOT_SciPlex3_within_context.ipynb
+│   ├── Compact_CellOT_SciPlex3_within_context.ipynb
+│   └── scGen_SciPlex3_within_context.ipynb
+│
+└── 2i_time_course/
+    └── LAOT_2i_time_course.ipynb
 ```
-
-> **Naming note.** Some notebooks use `AOT` in the filename. These notebooks implement the alternating optimal transport procedure used as LAOT in the paper.
 
 ---
 
@@ -222,12 +228,83 @@ pip install wot
 
 This repository does **not** redistribute the biological datasets. Please download each dataset from the original study or benchmark website, follow the corresponding license/terms of use, and cite the original data source in any derivative work. The synthetic experiments are generated directly by the notebooks and do not require an external dataset.
 
+A convenient local layout is:
+
+```text
+data/
+├── ap1/
+├── 4i/
+├── sciplex3/
+└── reprogramming_2i/
+```
+
+Before running a notebook, update the dataset path variables in the first configuration cells. The notebooks were written to reproduce the paper experiments, so they may contain local paths that should be changed to match your machine.
+
 | Dataset used in the paper | Original source to use | Notes for this repository |
 |---|---|---|
-| **AP-1 protein perturbations** | Comandante-Lou, Baumann, and Fallahi-Sichani, *Cell Reports* 2022: [study page / DOI](https://doi.org/10.1016/j.celrep.2022.111147), [PMC version](https://pmc.ncbi.nlm.nih.gov/articles/PMC9395172/), and the authors' [AP1-networkPlasticityMelanoma](https://github.com/fallahi-sichani-lab/AP1-networkPlasticityMelanoma) repository. In the paper, this is the AP-1 benchmark obtained from the original study page and **Supplementary Data S4**. | Used for DMSO $\rightarrow$ VEM protein perturbation prediction across melanoma cell lines. Place locally under `data/ap1/` after downloading. |
+| **AP-1 protein perturbations** | Comandante-Lou, Baumann, and Fallahi-Sichani, *Cell Reports* 2022: [study page / DOI](https://doi.org/10.1016/j.celrep.2022.111147), [PMC version](https://pmc.ncbi.nlm.nih.gov/articles/PMC9395172/), and the authors' [AP1-networkPlasticityMelanoma](https://github.com/fallahi-sichani-lab/AP1-networkPlasticityMelanoma) repository. In the paper, this benchmark is obtained from the original study page and **Supplementary Data S4**. | Used for DMSO $\rightarrow$ VEM protein perturbation prediction across melanoma cell lines. Place locally under `data/ap1/` after downloading. |
 | **4i multiplexed protein-imaging perturbations** | Gut et al., *Science* 2018: [paper / DOI](https://doi.org/10.1126/science.aar7042). For the benchmark format used by CellOT, use Bunne et al., *Nature Methods* 2023: [CellOT repository](https://github.com/bunnech/cellot) and [ETH Research Collection processed datasets](https://doi.org/10.3929/ethz-b-000609681). | Used for drug-response prediction after 8h exposure. Place locally under `data/4i/`. |
 | **SciPlex3 scRNA-seq perturbations** | Srivatsan et al., *Science* 2020: [paper / DOI](https://doi.org/10.1126/science.aax6234), [NCBI GEO GSE139944](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE139944), and the authors' [sci-plex code repository](https://github.com/cole-trapnell-lab/sci-plex). The CellOT-preprocessed version can also be obtained from the CellOT processed datasets above. | Used for 24h transcriptomic drug-response prediction. Place locally under `data/sciplex3/`. |
 | **2i reprogramming time-course** | Schiebinger et al., *Cell* 2019: [paper / DOI](https://doi.org/10.1016/j.cell.2019.01.006) and the [Waddington-OT tutorial/data page](https://broadinstitute.github.io/wot/tutorial/), which links the tutorial input data and transport maps. | Used for the 12h--168h time-gap sweep. Place locally under `data/reprogramming_2i/`. |
+
+---
+
+## Running experiments
+
+Open the repository with Jupyter and run the notebook corresponding to the desired experiment:
+
+```bash
+jupyter lab
+```
+
+You can also execute a notebook from the command line. For example:
+
+```bash
+jupyter nbconvert --to notebook --execute \
+  Synthetic_data_experiments/Synthetic_data_permutation.ipynb \
+  --output Synthetic_data_permutation.executed.ipynb
+```
+
+Suggested order for reproducing the main paper evidence:
+
+1. `Synthetic_data_experiments/Synthetic_data_permutation.ipynb` for the permutation-recovery phase transition.
+2. `Synthetic_data_experiments/LAOT_Synthetic_data.ipynb`, `Compact_CellOT_Synthetic_data.ipynb`, and `scGen_Synthetic_data.ipynb` for model degradation beyond trackability.
+3. `AP-1_within_context_protein_perturbation/` notebooks for the AP-1 protein benchmark.
+4. `4i_within_context_protein_perturbation/` notebooks for the 4i protein-imaging benchmark.
+5. `SciPlex3_within_context_scRNA-seq_perturbation/` notebooks for transcriptome-scale perturbation prediction.
+6. `2i_time_course/LAOT_2i_time_course.ipynb` for the biological time-gap sweep.
+
+---
+
+## Benchmarks reproduced in this repository
+
+| Benchmark | Modality | Setting | Main purpose |
+|---|---|---|---|
+| Synthetic near-identity data | simulated vectors | varying $t$ and $d$ | phase transition in latent permutation recovery |
+| AP-1 | targeted protein panel | DMSO $\rightarrow$ VEM, 48h | within-cell-line and replicate perturbation prediction |
+| 4i | multiplexed protein imaging | drug exposure, 8h | within-context drug perturbation prediction |
+| SciPlex3 | scRNA-seq | 24h drug response | transcriptome-scale perturbation prediction |
+| 2i time course | scRNA-seq trajectory | 12h to 168h horizons | biological time-gap sweep |
+| Cross-cell-line AP-1 | targeted protein panel | held-out cell line | out-of-context generalization stress test |
+
+### Representative paper results
+
+Lower MMD$^2$ is better.
+
+| Dataset | Condition | CellOT | scGen | Compact CellOT | LAOT |
+|---|---:|---:|---:|---:|---:|
+| AP-1 | COLO858 | 0.0995 | 0.0172 | 0.0019 | **0.0006** |
+| AP-1 | WM902B | 0.0443 | 0.1423 | 0.0015 | **0.0007** |
+| AP-1 | SKMEL19 | 0.1122 | 0.0323 | 0.0016 | **0.0011** |
+| 4i | Imatinib | 0.0700 | 0.0330 | 0.0079 | **0.0063** |
+| 4i | Trametinib | 0.0463 | 0.0098 | **0.0076** | 0.0080 |
+| 4i | Dexamethasone | 0.0685 | 0.0160 | 0.0075 | **0.0071** |
+
+| SciPlex3 drug | CellOT | scGen | Compact CellOT | LAOT |
+|---|---:|---:|---:|---:|
+| Trametinib | 0.0078 | 0.0059 | 0.0048 | **0.0040** |
+| Givinostat | 0.0117 | 0.0083 | 0.0079 | **0.0033** |
+| Abexinostat | 0.0129 | 0.0091 | 0.0074 | **0.0038** |
 
 ---
 
@@ -245,10 +322,11 @@ The paper reports MMD$^2$ under median-heuristic bandwidths and fixed-bandwidth 
 
 ## Reproducibility notes
 
+- Update all local data paths before running the biological notebooks.
 - Use the same train/test split protocol as the corresponding notebook.
 - For MMD$^2$, select the RBF bandwidth from the training split only to avoid test leakage.
-- LAOT has effectively deterministic behavior after the split is fixed, because it uses a linear assignment step and a least-squares map update.
-- Neural baselines can have nontrivial variance across random seeds. Report mean ± standard deviation over repeated runs.
+- LAOT is effectively deterministic after the split is fixed, because it uses a linear assignment step and a least-squares map update.
+- Neural baselines can have nontrivial variance across random seeds. Report mean $\pm$ standard deviation over repeated runs.
 - The untrackable regime should be interpreted as a computational/statistical barrier, not merely as a failure of one solver.
 
 ---
