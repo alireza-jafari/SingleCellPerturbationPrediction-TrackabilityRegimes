@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/alireza-jafari/SingleCellPerturbationPrediction-TrackabilityRegimes/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/Python-3.9-blue" alt="Python 3.9">
   <img src="https://img.shields.io/badge/PyTorch-supported-ee4c2c" alt="PyTorch">
   <img src="https://img.shields.io/badge/ICML-2026%20Spotlight-purple" alt="ICML 2026 Spotlight">
   <img src="https://img.shields.io/badge/Single--Cell-Perturbation%20Prediction-teal" alt="Single-cell perturbation prediction">
