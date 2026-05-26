@@ -173,6 +173,7 @@ CellOT parameterizes the transport map with an input-convex neural network and j
 scGen is a VAE-based generative model that learns a latent representation and predicts perturbation responses via latent-space arithmetic rather than explicit correspondence recovery, again relying on a comparatively large number of learnable parameters.
 
 We also include Compact CellOT, a reduced-capacity variant of CellOT with three hidden layers and 32 units per layer, to isolate the role of model capacity and computational complexity.
+
 ---
 
 ## Visual summary
