@@ -221,68 +221,6 @@ The repository is organized around the main experimental blocks of the paper. Ea
 
 ---
 
-## Repository structure
-
-```text
-.
-├── README.md
-├── LICENSE
-├── assets/
-│   ├── overview_trackability.png
-│   ├── synthetic_phase_transition.png
-│   ├── untrackable_model_degradation.png
-│   ├── optimization_stability.png
-│   └── file.png
-│
-├── Plots/
-│   ├── cellot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
-│   ├── compact_cellot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
-│   ├── laot_on_AP-1_drug_Vem_cell-line_COLO858_training.pdf
-│   ├── mmd2_gamma_0.100_2i.pdf
-│   └── permutation_recovery.pdf
-│
-├── Synthetic_data_experiments/
-│   ├── Synthetic_data_permutation.ipynb
-│   ├── LAOT_Synthetic_data.ipynb
-│   ├── Compact_CellOT_Synthetic_data.ipynb
-│   └── scGen_Synthetic_data.ipynb
-│
-├── AP-1_within_context_protein_perturbation/
-│   ├── LAOT_AP-1_within_context.ipynb
-│   ├── CellOT_AP-1_within_context.ipynb
-│   ├── Compact_CellOT_AP-1_within_context.ipynb
-│   └── scGen_AP-1_within_context.ipynb
-│
-├── AP-1_within_context_protein_perturbation_replicate/
-│   ├── LAOT_AP-1_within_context_replicate.ipynb
-│   ├── CellOT_AP-1_within_context_replicate.ipynb
-│   ├── Compact_CellOT_AP-1_within_context_replicate.ipynb
-│   └── scGen_AP-1_within_context_replicate.ipynb
-│
-├── AP-1_cross_context_protein_perturbation_OOD/
-│   ├── LAOT_AP-1_cross_context.ipynb
-│   ├── CellOT_AP-1_cross_context.ipynb
-│   ├── Compact_CellOT_AP-1_cross_context.ipynb
-│   └── scGen_AP-1_cross_context.ipynb
-│
-├── 4i_within_context_protein_perturbation/
-│   ├── LAOT_4i_within_context.ipynb
-│   ├── CellOT_4i_within_context.ipynb
-│   ├── Compact_CellOT_4i_within_context.ipynb
-│   └── scGen_4i_within_context.ipynb
-│
-├── SciPlex3_within_context_scRNA-seq_perturbation/
-│   ├── LAOT_SciPlex3_within_context.ipynb
-│   ├── CellOT_SciPlex3_within_context.ipynb
-│   ├── Compact_CellOT_SciPlex3_within_context.ipynb
-│   └── scGen_SciPlex3_within_context.ipynb
-│
-└── 2i_time_course/
-    └── LAOT_2i_time_course.ipynb
-```
-
----
-
 ## Installation
 
 A minimal environment can be created with Conda:
@@ -313,16 +251,6 @@ pip install wot
 ## Data setup
 
 This repository does **not** redistribute the biological datasets. Please download each dataset from the original study or benchmark website, follow the corresponding license/terms of use, and cite the original data source in any derivative work. The synthetic experiments are generated directly by the notebooks and do not require an external dataset.
-
-A convenient local layout is:
-
-```text
-data/
-├── ap1/
-├── 4i/
-├── sciplex3/
-└── reprogramming_2i/
-```
 
 Before running a notebook, update the dataset path variables in the first configuration cells. The notebooks were written to reproduce the paper experiments, so they may contain local paths that should be changed to match your machine.
 
