@@ -154,8 +154,7 @@ for k = 1, ..., K:
        solve the least-squares linear map update
 
 Output: W^(t,K) and predictor x_new^(t) = W^(t,K) x_new^(0)
-
-
+```
 ---
 
 ## Baseline implementations and provenance
