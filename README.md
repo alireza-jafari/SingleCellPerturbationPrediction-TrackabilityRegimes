@@ -29,7 +29,7 @@
 
 Single-cell perturbation analysis aims to predict how cellular states change after interventions such as drug treatments or genetic edits. A central difficulty is that pre- and post-perturbation measurements are typically observed as *unpaired* populations, so accurate prediction requires inferring a latent coupling and learning a transition map.
 
-In this position paper, we argue that the *measurement time gap* is the key experimental knob controlling both the computational tractability of coupling and the effective model complexity.
+**In our position paper, we argue that the *measurement time gap* is the key experimental knob controlling both the computational tractability of coupling and the effective model complexity.**
 
 This repository contains the implementation for the paper's synthetic experiments, biological benchmarks, baseline comparisons, and plotting scripts.
 
@@ -159,9 +159,9 @@ We compare LAOT to representative nonlinear baselines discussed in the paper.
 | Method | Role in this repository | Original implementation / reference code |
 |---|---|---|
 | **LAOT** | Implemented in this repository as the minimal linear alternating OT solver. | This repository. |
-| **CellOT** | Nonlinear neural OT baseline. | Official CellOT repository: <https://github.com/bunnech/cellot> |
+| **CellOT** | Nonlinear neural OT baseline. |  Implemented in this repository by modifying the official CellOT repository: <https://github.com/bunnech/cellot> |
 | **Compact CellOT** | Reduced-capacity CellOT variant used to isolate the role of model capacity and computational complexity. | Implemented in this repository by modifying the CellOT architecture. |
-| **scGen** | VAE-based generative baseline. | Official scGen repository: <https://github.com/theislab/scgen>; scGen reproducibility repository: <https://github.com/theislab/scgen-reproducibility> |
+| **scGen** | VAE-based generative baseline. | Official scGen repository: <https://github.com/theislab/scgen> |
 
 CellOT parameterizes the transport map with an input-convex neural network and jointly learns the OT coupling and the mapping; their default configuration has four hidden layers with 64 units each, yielding a parameter count that is orders of magnitude larger than LAOT.
 
@@ -176,7 +176,7 @@ We also modify Compact_CellOT, a reduced-capacity variant of CellOT (three hidde
 ### Synthetic phase transition
 
 <p align="center">
-  <img src="assets/synthetic_phase_transition.png" width="560" alt="Synthetic phase transition in permutation recovery">
+  <img src="assets/synthetic_phase_transition.png" width="550" alt="Synthetic phase transition in permutation recovery">
 </p>
 
 Figure shows a sharp two-regime behavior: for fine time gap $t$, LAOT recovers the matching with near-perfect probability, while beyond a critical time scale the recovery rate rapidly collapses.
@@ -347,15 +347,6 @@ jupyter nbconvert --to notebook --execute \
   --output Synthetic_data_permutation.executed.ipynb
 ```
 
-Suggested order for reproducing the main paper evidence:
-
-1. `Synthetic_data_experiments/Synthetic_data_permutation.ipynb` for the permutation-recovery phase transition.
-2. `Synthetic_data_experiments/LAOT_Synthetic_data.ipynb`, `Compact_CellOT_Synthetic_data.ipynb`, and `scGen_Synthetic_data.ipynb` for model degradation beyond trackability.
-3. `AP-1_within_context_protein_perturbation/` notebooks for the AP-1 protein benchmark.
-4. `4i_within_context_protein_perturbation/` notebooks for the 4i protein-imaging benchmark.
-5. `SciPlex3_within_context_scRNA-seq_perturbation/` notebooks for transcriptome-scale perturbation prediction.
-6. `2i_time_course/LAOT_2i_time_course.ipynb` for the biological time-gap sweep.
-
 ---
 
 ## Benchmarks reproduced in this repository
@@ -426,7 +417,7 @@ Unless stated otherwise, we choose $\gamma$ via the median heuristic *using the 
 
 ## Generative AI disclosure
 
-Generative AI tools were used to assist with manuscript editing, clarity improvements, general feedback, and parts of the implementation, including evaluation utilities, plotting scripts, documentation, and reproducibility instructions. All scientific claims, experimental results, final manuscript text, and released code were reviewed, edited, tested, and validated by the authors.
+Generative AI tools were used to assist with parts of the implementation, including evaluation utilities, plotting scripts, documentation, and reproducibility instructions. All scientific claims, experimental results, final manuscript text, and released code were reviewed, edited, tested, and validated by the authors.
 
 ---
 
