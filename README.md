@@ -89,7 +89,7 @@ Our analysis assumes that the data matrix $X^{(0)}$, whose columns correspond to
 
 ## Time-driven phase transition
 
-We identify a critical time gap $\Delta$ that induces a phase transition, under biologically inspired conditions; for ``measurement-time $<\Delta$'', matching is polynomial-time tractable and the task reduces to supervised learning, whereas for ``measurement-time $>\Delta$'', recovering the matching is NP-hard in the worst case.
+**We identify a critical time gap $\Delta$ that induces a phase transition, under biologically inspired conditions; for ``measurement-time $<\Delta$'', matching is polynomial-time tractable and the task reduces to supervised learning, whereas for ``measurement-time $>\Delta$'', recovering the matching is NP-hard in the worst case.**
 
 Define the measurement time gap
 
