@@ -159,21 +159,20 @@ Output: W^(t,K) and predictor x_new^(t) = W^(t,K) x_new^(0)
 
 ## Baseline implementations and provenance
 
-We compare LAOT to representative nonlinear baselines discussed in the paper.
+We compare LAOT with representative nonlinear baselines discussed in the paper.
 
-| Method | Role in this repository | Original implementation / reference code |
+| Method | Role in this repository | Implementation / reference code |
 |---|---|---|
-| **LAOT** | Implemented in this repository as the minimal linear alternating OT solver. | This repository. |
-| **CellOT** | Nonlinear neural OT baseline. |  Implemented in this repository by modifying the official CellOT repository: <https://github.com/bunnech/cellot> |
+| **LAOT** | Minimal linear alternating optimal transport solver proposed in the paper. | Implemented in this repository from Algorithm 1 in the paper. |
+| **CellOT** | Nonlinear neural optimal transport baseline. | Adapted from the official CellOT repository: <https://github.com/bunnech/cellot> |
 | **Compact CellOT** | Reduced-capacity CellOT variant used to isolate the role of model capacity and computational complexity. | Implemented in this repository by modifying the CellOT architecture. |
 | **scGen** | VAE-based generative baseline. | Official scGen repository: <https://github.com/theislab/scgen> |
 
-CellOT parameterizes the transport map with an input-convex neural network and jointly learns the OT coupling and the mapping; their default configuration has four hidden layers with 64 units each, yielding a parameter count that is orders of magnitude larger than LAOT.
+CellOT parameterizes the transport map with an input-convex neural network and jointly learns the OT coupling and the mapping. Its default configuration has four hidden layers with 64 units each, yielding a parameter count that is orders of magnitude larger than LAOT.
 
 scGen is a VAE-based generative model that learns a latent representation and predicts perturbation responses via latent-space arithmetic rather than explicit correspondence recovery, again relying on a comparatively large number of learnable parameters.
 
-We also modify Compact_CellOT, a reduced-capacity variant of CellOT (three hidden layers with 32 units each), used to isolate the role of model capacity and computational complexity.
-
+We also include Compact CellOT, a reduced-capacity variant of CellOT with three hidden layers and 32 units per layer, to isolate the role of model capacity and computational complexity.
 ---
 
 ## Visual summary
