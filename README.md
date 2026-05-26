@@ -123,13 +123,21 @@ where $W_\star^{(t)}$ is unknown.
 Concretely, there exists an unknown permutation $\sigma:[n]\to[n]$ such that
 
 $$
-x_i^{(t)} = W_\star^{(t)} x_{\sigma(i)}^{(0)} \qquad (i=1,\dots,n).
+x_i^{(t)} = W_\star^{(t)}x_{\sigma(i)}^{(0)}
+\qquad i=1,\ldots,n.
 $$
 
-Let $\Pi_\star\in\Gamma$ be the permutation matrix induced by $\sigma$, so that $(X^{(0)}\Pi_\star)_{:,i}=X^{(0)}_{:,\sigma(i)}$, and $\Gamma$ denotes the Birkhoff polytope (the set of doubly stochastic matrices). Estimating the transition therefore amounts to recovering $(\Pi_\star,W_\star^{(t)})$ by least squares:
+Let $\Pi_\star\in\Gamma$ be the permutation matrix induced by $\sigma$, where $\Gamma$ denotes the Birkhoff polytope, that is, the set of doubly stochastic matrices. Equivalently, if $e_i$ denotes the $i$-th standard basis vector in $\mathbb{R}^n$, then
 
 $$
-\min_{\Pi\in\Gamma,\; W^{(t)}\in\mathbb{R}^{d\times d}} \;\;\big\|X^{(t)}- W^{(t)} X^{(0)} \Pi\big\|_F^2.
+X^{(0)}\Pi_\star e_i = X^{(0)}e_{\sigma(i)} = x_{\sigma(i)}^{(0)}.
+$$
+
+Estimating the transition therefore amounts to recovering $(\Pi_\star,W_\star^{(t)})$ by least squares:
+
+$$
+\min_{\Pi\in\Gamma,\, W^{(t)}\in\mathbb{R}^{d\times d}}
+\left\|X^{(t)} - W^{(t)}X^{(0)}\Pi\right\|_F^2.
 $$
 
 The objective is not jointly convex in $(\Pi,W^{(t)})$. However, each block subproblem is polynomial-time solvable, motivating a natural alternating-minimization algorithm called Linear Alternating Optimal Transport (LAOT).
@@ -146,9 +154,6 @@ for k = 1, ..., K:
        solve the least-squares linear map update
 
 Output: W^(t,K) and predictor x_new^(t) = W^(t,K) x_new^(0)
-```
-
-LAOT is not introduced for novelty, but as a minimal polynomial-time mechanism that isolates the source of computational hardness.
 
 ---
 
