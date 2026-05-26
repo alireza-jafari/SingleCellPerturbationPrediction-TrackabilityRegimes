@@ -155,6 +155,7 @@ for k = 1, ..., K:
 
 Output: W^(t,K) and predictor x_new^(t) = W^(t,K) x_new^(0)
 
+
 ---
 
 ## Baseline implementations and provenance
