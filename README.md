@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/alireza-jafari/SingleCellPerturbationPrediction-TrackabilityRegimes/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/Python-3.9-blue" alt="Python 3.9">
+  <img src="https://img.shields.io/badge/Python-3.10-blue" alt="Python 3.10">
   <img src="https://img.shields.io/badge/PyTorch-supported-ee4c2c" alt="PyTorch">
   <img src="https://img.shields.io/badge/ICML-2026%20Spotlight-purple" alt="ICML 2026 Spotlight">
   <img src="https://img.shields.io/badge/Single--Cell-Perturbation%20Prediction-teal" alt="Single-cell perturbation prediction">
@@ -25,67 +25,149 @@
 
 ---
 
-## Core message
+## Overview
 
-Single-cell perturbation prediction is often treated as a purely modeling problem: collect unpaired control and treated cell populations, then fit a sufficiently expressive model to map one distribution to the other. This repository supports a different conclusion:
+Single-cell perturbation analysis aims to predict how cellular states change after interventions such as drug treatments or genetic edits. A central difficulty is that pre- and post-perturbation measurements are typically observed as *unpaired* populations, so accurate prediction requires inferring a latent coupling and learning a transition map.
 
-> **The measurement time gap is an experimental knob that controls both computational tractability and model complexity.**
+In this position paper, we argue that the *measurement time gap* is the key experimental knob controlling both the computational tractability of coupling and the effective model complexity.
 
-When the post-perturbation measurement is collected before a critical time gap $\Delta$, the latent correspondence between control and treated populations can be recovered efficiently under the paper's assumptions. After this correspondence is recovered, learning the perturbation map reduces to supervised estimation, and a simple linear model can be sufficient. When the measurement gap exceeds $\Delta$, correspondence recovery becomes NP-hard in the worst case, even when the underlying transition is linear.
+This repository contains the implementation for the paper's synthetic experiments, biological benchmarks, baseline comparisons, and plotting scripts.
 
 ---
 
 ## Problem formulation
 
-We observe two unpaired populations:
+After a perturbation, cellular states evolve over time.
 
-- control cells at time $0$: $X^{(0)} = [x_1^{(0)}, \dots, x_n^{(0)}] \in \mathbb{R}^{d \times n}$,
-- treated cells at time $t$: $X^{(t)} = [x_1^{(t)}, \dots, x_n^{(t)}] \in \mathbb{R}^{d \times n}$.
+Let $x_1^{(0)}, \dots, x_n^{(0)} \in \mathbb{R}^d$ be i.i.d. pre-perturbation states drawn from an unknown distribution, and let $x_1^{(t)}, \dots, x_n^{(t)} \in \mathbb{R}^d$ be post-perturbation states measured at time $t$, but *without known pairing* to the pre-perturbation cells.
 
-The paper models the treated population as
+We assume there exists an *unknown* map $F_t : \mathbb{R}^d \to \mathbb{R}^d$ such that $x_i^{(t)} = F_t(x_{\sigma(i)}^{(0)})$ for some unknown permutation $\sigma$ of $[n] := \{1,2,\dots,n\}$.
+
+The goal is to learn a map $F_t$ that allows us to predict the post-perturbation state of a new cell, namely, $x_{\mathrm{test}}^{(t)} \approx F_t\left(x_{\mathrm{test}}^{(0)}\right)$.
+
+By definition, $F_0$ is the identity map, i.e., $F_0(x) = x$.
+
+To formulate this compactly, we introduce the matrix $X^{(0)} \in \mathbb{R}^{d\times n}$ whose columns are $x_1^{(0)}, \dots, x_n^{(0)}$, and similarly define the matrix $X^{(t)} \in \mathbb{R}^{d\times n}$ containing the columns $x_1^{(t)}, \dots, x_n^{(t)}$.
+
+Cell perturbation analysis can thus be viewed as supervised learning with unknown correspondences between predictor and response variables.
+
+---
+
+## Assumptions
+
+Our results rely on biologically motivated insights and assumptions. In particular, we assume (i) *temporal smoothness* of the perturbation dynamics, and (ii) a *restricted isometry property* (RIP) for the pre-perturbation cell states.
+
+In our experiments, we explicitly demonstrate regimes where these assumptions hold and settings where they break down.
+
+### Smooth perturbation dynamics
+
+Drug-induced perturbations act over time: a compound must engage its targets, trigger signaling cascades, and alter downstream transcriptional or translational programs before inducing measurable cellular responses.
+
+We assume that the transition map $F_t$ is Lipschitz continuous in time, i.e.,
 
 $$
-x_i^{(t)} = F_t\left(x_{\sigma(i)}^{(0)}\right),
+\sup_x \|F_t(x) - F_{t'}(x)\| \leq L |t - t'|,
 $$
 
-where $F_t$ is the perturbation transition map and $\sigma$ is an unknown latent matching between populations.
+for all $t,t'$, where $L > 0$ is a constant.
 
-The critical time gap is
+### Restricted isometry of initial states
+
+The second assumption governing our theory and experiments concerns the geometric structure of the pre-perturbation data. Specifically, we rely on a restricted isometry property, originally introduced and extensively studied in compressed sensing.
+
+Let $A \in \mathbb{R}^{p \times q}$ and $k \in \mathbb{N}$. We say that $A$ satisfies the $(k,\delta)$-RIP if $\delta$ is the smallest constant such that
 
 $$
-\Delta = \sqrt{\frac{1-\delta}{2nL^2}},
+(1-\delta)\|v\|_2^2 \le \|A v\|_2^2 \le (1+\delta)\|v\|_2^2
 $$
 
-where $L$ controls temporal smoothness of the transition map and $\delta$ is the restricted-isometry constant of the initial cell-state matrix.
+holds for all $k$-sparse vectors $v \in \mathbb{R}^q$.
 
-| Regime | Condition | Computational consequence | Modeling consequence |
-|---|---:|---|---|
-| **Trackable** | $t < \Delta$ | permutation/coupling recovery is polynomial-time tractable | after matching, the task reduces to supervised learning |
-| **Untrackable** | $t > \Delta$ | recovery is NP-hard in the worst case | expressive nonlinear models do not remove the intrinsic barrier |
+Our analysis assumes that the data matrix $X^{(0)}$, whose columns correspond to pre-perturbation cell states, satisfies an RIP condition.
+
+---
+
+## Time-driven phase transition
+
+We identify a critical time gap $\Delta$ that induces a phase transition, under biologically inspired conditions; for ``measurement-time $<\Delta$'', matching is polynomial-time tractable and the task reduces to supervised learning, whereas for ``measurement-time $>\Delta$'', recovering the matching is NP-hard in the worst case.
+
+Define the measurement time gap
+
+$$
+\Delta \coloneqq \sqrt{\frac{1-\delta}{2nL^2}}.
+$$
+
+Then the problem of recovering the permutation $\sigma$ exhibits a phase transition as a function of time $t$:
+
+| Regime | Condition | Computational consequence |
+|---|---:|---|
+| **Trackable regime** | $t < \Delta$ | The permutation $\sigma$ can be recovered in polynomial time as long as $X^{(0)}$ satisfies the $(2,\delta)$-RIP condition and the transition map is Lipschitz continuous in time. |
+| **Untrackable regime** | $t > \Delta$ | Recovering $\sigma$, and consequently the transition map $F_t$, is NP-hard even when $F_t$ is a linear function. |
+
+The theorem reveals that the trackable time gap is jointly governed by the geometric properties of the problem, where smoother transition dynamics (smaller Lipschitz constants) and robust initial RIP conditions directly extend the trackable time gap.
 
 ---
 
 ## Method: Linear Alternating Optimal Transport (LAOT)
 
-LAOT is intentionally minimal. It alternates between a correspondence step and a linear-map step:
+The fundamental difficulty in solving the linear-transition problem is that the data are unpaired.
+
+We study the problem of estimating a linear transition map of the form
+
+$$
+F_t(x) = W_\star^{(t)}x,
+$$
+
+where $W_\star^{(t)}$ is unknown.
+
+Concretely, there exists an unknown permutation $\sigma:[n]\to[n]$ such that
+
+$$
+x_i^{(t)} = W_\star^{(t)} x_{\sigma(i)}^{(0)} \qquad (i=1,\dots,n).
+$$
+
+Let $\Pi_\star\in\Gamma$ be the permutation matrix induced by $\sigma$, so that $(X^{(0)}\Pi_\star)_{:,i}=X^{(0)}_{:,\sigma(i)}$, and $\Gamma$ denotes the Birkhoff polytope (the set of doubly stochastic matrices). Estimating the transition therefore amounts to recovering $(\Pi_\star,W_\star^{(t)})$ by least squares:
+
+$$
+\min_{\Pi\in\Gamma,\; W^{(t)}\in\mathbb{R}^{d\times d}} \;\;\big\|X^{(t)}- W^{(t)} X^{(0)} \Pi\big\|_F^2.
+$$
+
+The objective is not jointly convex in $(\Pi,W^{(t)})$. However, each block subproblem is polynomial-time solvable, motivating a natural alternating-minimization algorithm called Linear Alternating Optimal Transport (LAOT).
 
 ```text
-Input: control matrix X0, treated matrix Xt, number of iterations K
-Initialize W = I
+Input: unpaired control samples X^(0), treated samples X^(t), iterations K
+Initialize W^(t,0) = I_d
 
 for k = 1, ..., K:
-    1. Matching step:
-       find Π that minimizes ||Xt - W X0 Π||_F^2
-       using a linear assignment / optimal transport solver
+    1. Optimizing Π:
+       solve the linear assignment / optimal transport problem
 
-    2. Linear map step:
-       find W that minimizes ||Xt - W X0 Π||_F^2
-       using ordinary least squares
+    2. Optimizing W^(t):
+       solve the least-squares linear map update
 
-Output: W and predictor x_new^(t) = W x_new^(0)
+Output: W^(t,K) and predictor x_new^(t) = W^(t,K) x_new^(0)
 ```
 
-The method is not introduced as a high-capacity architecture. Its purpose is to isolate the role of measurement timing: when the experimental design places the task in the trackable regime, a simple linear transition can match or outperform larger nonlinear baselines.
+LAOT is not introduced for novelty, but as a minimal polynomial-time mechanism that isolates the source of computational hardness.
+
+---
+
+## Baseline implementations and provenance
+
+We compare LAOT to representative nonlinear baselines discussed in the paper.
+
+| Method | Role in this repository | Original implementation / reference code |
+|---|---|---|
+| **LAOT** | Implemented in this repository as the minimal linear alternating OT solver. | This repository. |
+| **CellOT** | Nonlinear neural OT baseline. | Official CellOT repository: <https://github.com/bunnech/cellot> |
+| **Compact CellOT** | Reduced-capacity CellOT variant used to isolate the role of model capacity and computational complexity. | Implemented in this repository by modifying the CellOT architecture. |
+| **scGen** | VAE-based generative baseline. | Official scGen repository: <https://github.com/theislab/scgen>; scGen reproducibility repository: <https://github.com/theislab/scgen-reproducibility> |
+
+CellOT parameterizes the transport map with an input-convex neural network and jointly learns the OT coupling and the mapping; their default configuration has four hidden layers with 64 units each, yielding a parameter count that is orders of magnitude larger than LAOT.
+
+scGen is a VAE-based generative model that learns a latent representation and predicts perturbation responses via latent-space arithmetic rather than explicit correspondence recovery, again relying on a comparatively large number of learnable parameters.
+
+We also modify Compact_CellOT, a reduced-capacity variant of CellOT (three hidden layers with 32 units each), used to isolate the role of model capacity and computational complexity.
 
 ---
 
@@ -97,7 +179,7 @@ The method is not introduced as a high-capacity architecture. Its purpose is to 
   <img src="assets/synthetic_phase_transition.png" width="560" alt="Synthetic phase transition in permutation recovery">
 </p>
 
-In the controlled synthetic setup, the ground-truth map follows a near-identity linear path $W_\star(t)=I+tE$. LAOT recovers the latent permutation with near-perfect accuracy for small $t$, but recovery rapidly collapses after the transition into the NP-hard regime. Larger feature dimensions expand the trackable window.
+Figure shows a sharp two-regime behavior: for fine time gap $t$, LAOT recovers the matching with near-perfect probability, while beyond a critical time scale the recovery rate rapidly collapses.
 
 ### Nonlinear baselines also degrade beyond trackability
 
@@ -105,7 +187,7 @@ In the controlled synthetic setup, the ground-truth map follows a near-identity 
   <img src="assets/untrackable_model_degradation.png" width="950" alt="Model degradation beyond the trackable regime for Compact CellOT, scGen, and LAOT">
 </p>
 
-The collapse is not specific to LAOT. Compact CellOT, scGen, and LAOT all show increasing distributional error once the measurement gap enters the untrackable regime.
+This degradation is not limited to the linear solver: state-of-the-art nonlinear models exhibit the same collapse, indicating that model expressivity alone does not remove the intrinsic trackability barrier.
 
 ### Optimization stability in the trackable regime
 
@@ -113,7 +195,7 @@ The collapse is not specific to LAOT. Compact CellOT, scGen, and LAOT all show i
   <img src="assets/optimization_stability.png" width="950" alt="Optimization stability comparison on AP-1 COLO858 DMSO to VEM">
 </p>
 
-On the within-context AP-1 task, high-capacity CellOT can show non-monotone training dynamics. Compact CellOT stabilizes part of the trajectory, while LAOT converges rapidly with nearly coincident train/test curves.
+CellOT exhibits highly non-monotone training dynamics, whereas capacity reduction stabilizes training but can introduce long plateaus. LAOT converges rapidly with near-coincident train/test curves.
 
 ---
 
@@ -310,13 +392,24 @@ Lower MMD$^2$ is better.
 
 ## Evaluation metric
 
-The main evaluation metric is the squared Maximum Mean Discrepancy, MMD$^2$, with a Gaussian RBF kernel:
+We evaluate set-level prediction quality using the squared Maximum Mean Discrepancy (MMD$^2$), a kernel two-sample distance that is zero if and only if the underlying distributions match (for characteristic kernels).
+
+Given samples $\mathcal{X}=\{x_i\}_{i=1}^{n}\subset\mathbb{R}^d$ and $\mathcal{Y}=\{y_j\}_{j=1}^{m}\subset\mathbb{R}^d$ and a positive definite kernel $k(\cdot,\cdot)$, we use the unbiased empirical estimator
 
 $$
-k_\gamma(u,v) = \exp\left(-\gamma \|u-v\|_2^2\right).
+\widehat{\mathrm{MMD}}^2(\mathcal{X},\mathcal{Y};k) =
+\frac{1}{n(n-1)}\sum_{i\neq i'} k(x_i,x_{i'}) +
+\frac{1}{m(m-1)}\sum_{j\neq j'} k(y_j,y_{j'})
+-\frac{2}{nm}\sum_{i=1}^{n}\sum_{j=1}^{m} k(x_i,y_j).
 $$
 
-The paper reports MMD$^2$ under median-heuristic bandwidths and fixed-bandwidth sensitivity checks. For high-dimensional scRNA-seq experiments, MMD$^2$ is computed in highly variable gene subspaces to improve stability and comparability.
+In all experiments, we use the Gaussian RBF kernel
+
+$$
+k_{\gamma}(u,v)=\exp\!\big(-\gamma \|u-v\|_2^2\big).
+$$
+
+Unless stated otherwise, we choose $\gamma$ via the median heuristic *using the training split only* to avoid test leakage.
 
 ---
 
@@ -328,6 +421,12 @@ The paper reports MMD$^2$ under median-heuristic bandwidths and fixed-bandwidth 
 - LAOT is effectively deterministic after the split is fixed, because it uses a linear assignment step and a least-squares map update.
 - Neural baselines can have nontrivial variance across random seeds. Report mean $\pm$ standard deviation over repeated runs.
 - The untrackable regime should be interpreted as a computational/statistical barrier, not merely as a failure of one solver.
+
+---
+
+## Generative AI disclosure
+
+Generative AI tools were used to assist with manuscript editing, clarity improvements, general feedback, and parts of the implementation, including evaluation utilities, plotting scripts, documentation, and reproducibility instructions. All scientific claims, experimental results, final manuscript text, and released code were reviewed, edited, tested, and validated by the authors.
 
 ---
 
